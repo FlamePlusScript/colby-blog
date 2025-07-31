@@ -1,23 +1,18 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session, url_for
 import json
 from datetime import datetime
-import os
-import logging
 
 app = Flask(__name__)
-logging.basicConfig(level=logging.DEBUG)
+app.secret_key = 'supersecretkey'  # Replace with a more secure key in production
 
-POSTS_FILE = 'posts.json'
+ADMIN_USERNAME = "horsmanAdmin"
+ADMIN_PASSWORD = "Spyglass4821"
 
-# Ensure the JSON file exists
 def load_posts():
-    if not os.path.exists(POSTS_FILE):
-        with open(POSTS_FILE, 'w') as f:
-            json.dump([], f)
     try:
-        with open(POSTS_FILE, 'r') as f:
+        with open('posts.json', 'r') as f:
             return json.load(f)
-    except json.JSONDecodeError:
+    except:
         return []
 
 def save_post(title, content):
@@ -27,26 +22,103 @@ def save_post(title, content):
         "content": content,
         "date": datetime.now().strftime("%Y-%m-%d %H:%M")
     })
-    with open(POSTS_FILE, 'w') as f:
+    with open('posts.json', 'w') as f:
         json.dump(posts, f, indent=2)
 
 @app.route('/')
+def home():
+    return render_template('home.html')
+
+@app.route('/blog')
 def index():
     posts = load_posts()
     return render_template('index.html', posts=posts)
 
-@app.route('/new', methods=['POST'])
-def new_post():
-    title = request.form.get('title')
-    content = request.form.get('content')
-    if title and content:
-        save_post(title, content)
-    return redirect('/')
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        if request.form['username'] == ADMIN_USERNAME and request.form['password'] == ADMIN_PASSWORD:
+            session['logged_in'] = True
+            return redirect(url_for('new_post'))
+    return render_template('login.html')
 
-# Health check route (useful for Render)
-@app.route('/healthz')
-def health():
-    return "OK", 200
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+@app.route('/new', methods=['GET', 'POST'])
+def new_post():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        save_post(title, content)
+        return redirect(url_for('index'))
+    return render_template('new_post.html')
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5050)
+from flask import Flask, render_template, request, redirect, session, url_for
+import json
+from datetime import datetime
+
+app = Flask(__name__)
+app.secret_key = 'supersecretkey'  # Replace with a more secure key in production
+
+ADMIN_USERNAME = "horsmanAdmin"
+ADMIN_PASSWORD = "Spyglass4821"
+
+def load_posts():
+    try:
+        with open('posts.json', 'r') as f:
+            return json.load(f)
+    except:
+        return []
+
+def save_post(title, content):
+    posts = load_posts()
+    posts.insert(0, {
+        "title": title,
+        "content": content,
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M")
+    })
+    with open('posts.json', 'w') as f:
+        json.dump(posts, f, indent=2)
+
+@app.route('/')
+def home():
+    return render_template('home.html')
+
+@app.route('/blog')
+def index():
+    posts = load_posts()
+    return render_template('index.html', posts=posts)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        if request.form['username'] == ADMIN_USERNAME and request.form['password'] == ADMIN_PASSWORD:
+            session['logged_in'] = True
+            return redirect(url_for('new_post'))
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+@app.route('/new', methods=['GET', 'POST'])
+def new_post():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        save_post(title, content)
+        return redirect(url_for('index'))
+    return render_template('new_post.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5050)
