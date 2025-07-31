@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 import json
 from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key_here'  # Required for session
 
 def load_posts():
     try:
@@ -32,13 +33,21 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         if username == 'horsmanAdmin' and password == 'Spyglass4821':
+            session['logged_in'] = True
             return redirect('/new')
         else:
             return 'Invalid credentials', 403
     return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect('/')
+
 @app.route('/new', methods=['GET', 'POST'])
 def new_post():
+    if not session.get('logged_in'):
+        return redirect('/login')
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
