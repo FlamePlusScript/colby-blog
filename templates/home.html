@@ -1,39 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Colby Horsman | Home</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <title>Colby Horsman – Blog</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <header class="header">
+  <div class="header">
     <h1>Colby Horsman</h1>
-    <p class="tagline">Developer • Builder • Creator</p>
-  </header>
+    <nav>
+      <a href="/">Blog</a>
+      <a href="/login">Login</a>
+    </nav>
+  </div>
 
-  <main class="container">
-    <section class="intro">
-      <h2>Welcome</h2>
-      <p>This is my personal site where I share everything I'm working on—projects, blog posts, and experiments.</p>
-    </section>
-
-    <section class="projects">
-      <h2>Projects</h2>
-      <ul class="project-list">
-        <li><a href="/blog">📝 My Blog</a></li>
-        <!-- Add more projects below -->
-        <li><a href="#">🔧 Rocket Flight Computer</a></li>
-        <li><a href="#">📡 Remote Detonator Project</a></li>
-        <li><a href="#">🎯 AI Resume Booster</a></li>
-      </ul>
-    </section>
-
-    <section class="contact">
-      <h2>Contact</h2>
-      <p>Email: colbyhorsman09@gmail.com</p>
-      <p>GitHub: <a href="https://github.com/FlamePlusScript" target="_blank">FlamePlusScript</a></p>
-    </section>
-  </main>
+  <div class="container">
+    <h2>Welcome to my blog</h2>
+    <p>All posts are written by me, Colby Horsman.</p>
+    <a href="/" style="display:inline-block;margin-top:1rem;text-decoration:none;color:#1a73e8;">→ Read the blog</a>
+  </div>
 </body>
 </html>
